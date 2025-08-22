@@ -23,11 +23,15 @@ jobs:
     - name: Show available simulators
       run: xcrun simctl list devices available
       
+    - name: List available schemes
+      run: xcodebuild -list -project RotaryPhone.xcodeproj
+      
     - name: Clean build folder
       run: |
         xcodebuild clean \
           -project RotaryPhone.xcodeproj \
-          -scheme RotaryPhone
+          -scheme RotaryPhone \
+          -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest'
     
     - name: Build and test
       run: |
