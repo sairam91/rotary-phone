@@ -46,8 +46,12 @@ jobs:
           
           for DEVICE_TYPE in "${DEVICE_TYPES[@]}"; do
             echo "Trying device type: $DEVICE_TYPE"
-            # Find a stable iOS runtime (avoid beta versions)
-            RUNTIME=$(xcrun simctl list runtimes | grep iOS | grep -v beta | head -1 | awk '{print $NF}')
+            # Find a stable iOS runtime (avoid beta versions and prefer 18.5+)
+            RUNTIME=$(xcrun simctl list runtimes | grep iOS | grep -v beta | grep -E "(18\.[5-9]|19\.)" | head -1 | awk '{print $NF}')
+            if [ -z "$RUNTIME" ]; then
+              # Fallback to any stable iOS runtime
+              RUNTIME=$(xcrun simctl list runtimes | grep iOS | grep -v beta | head -1 | awk '{print $NF}')
+            fi
             echo "Using runtime: $RUNTIME"
             
             SIMULATOR_UUID=$(xcrun simctl create "TestiPhone" "$DEVICE_TYPE" "$RUNTIME" 2>/dev/null || true)
