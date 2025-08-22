@@ -14,14 +14,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Select Xcode version
-      run: sudo xcode-select -switch /Applications/Xcode_15.4.app/Contents/Developer
+    - name: Show available Xcode versions
+      run: ls /Applications/ | grep Xcode
       
-    - name: Show Xcode version
+    - name: Show current Xcode version
       run: xcodebuild -version
       
     - name: Show available simulators
-      run: xcrun simctl list devicetypes
+      run: xcrun simctl list devices available
       
     - name: Clean build folder
       run: |
@@ -34,7 +34,7 @@ jobs:
         xcodebuild test \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
+          -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
           -enableCodeCoverage YES \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
