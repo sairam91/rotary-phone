@@ -21,7 +21,7 @@ jobs:
       run: xcodebuild -version
       
     - name: Show available simulators
-      run: xcrun simctl list devices available
+      run: xcrun simctl list devices available | head -20
       
     - name: List available schemes
       run: xcodebuild -list -project RotaryPhone.xcodeproj
@@ -31,14 +31,14 @@ jobs:
         xcodebuild clean \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest'
+          -destination 'generic/platform=iOS Simulator'
     
     - name: Build and test
       run: |
         xcodebuild test \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
+          -destination 'generic/platform=iOS Simulator' \
           -enableCodeCoverage YES \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
