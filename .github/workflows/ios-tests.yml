@@ -1,0 +1,56 @@
+name: iOS Unit Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode version
+      run: sudo xcode-select -switch /Applications/Xcode_15.4.app/Contents/Developer
+      
+    - name: Show Xcode version
+      run: xcodebuild -version
+      
+    - name: Show available simulators
+      run: xcrun simctl list devicetypes
+      
+    - name: Clean build folder
+      run: |
+        xcodebuild clean \
+          -project RotaryPhone.xcodeproj \
+          -scheme RotaryPhone
+    
+    - name: Build and test
+      run: |
+        xcodebuild test \
+          -project RotaryPhone.xcodeproj \
+          -scheme RotaryPhone \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
+          -enableCodeCoverage YES \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+          
+    - name: Generate test report
+      if: always()
+      run: |
+        if [ -d "~/Library/Developer/Xcode/DerivedData" ]; then
+          find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" -exec echo "Found test results: {}" \;
+        fi
+        
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult
+        retention-days: 30
