@@ -26,22 +26,44 @@ jobs:
     - name: List available schemes
       run: xcodebuild -list -project RotaryPhone.xcodeproj
       
+    - name: Create and boot simulator
+      run: |
+        # Create a new iPhone simulator with available iOS version
+        DEVICE_TYPE=$(xcrun simctl list devicetypes | grep iPhone | tail -1 | awk -F'[()]' '{print $(NF-1)}')
+        RUNTIME=$(xcrun simctl list runtimes | grep iOS | tail -1 | awk '{print $NF}')
+        echo "Creating simulator with device type: $DEVICE_TYPE and runtime: $RUNTIME"
+        
+        SIMULATOR_UUID=$(xcrun simctl create "TestiPhone" "$DEVICE_TYPE" "$RUNTIME")
+        echo "Created simulator: $SIMULATOR_UUID"
+        
+        # Boot the simulator
+        xcrun simctl boot "$SIMULATOR_UUID"
+        echo "SIMULATOR_UUID=$SIMULATOR_UUID" >> $GITHUB_ENV
+        
     - name: Clean build folder
       run: |
         xcodebuild clean \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'generic/platform=iOS Simulator'
+          -destination "platform=iOS Simulator,id=$SIMULATOR_UUID"
     
     - name: Build and test
       run: |
         xcodebuild test \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'generic/platform=iOS Simulator' \
+          -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
           -enableCodeCoverage YES \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
+          
+    - name: Cleanup simulator
+      if: always()
+      run: |
+        if [ ! -z "$SIMULATOR_UUID" ]; then
+          xcrun simctl shutdown "$SIMULATOR_UUID" || true
+          xcrun simctl delete "$SIMULATOR_UUID" || true
+        fi
           
     - name: Generate test report
       if: always()
