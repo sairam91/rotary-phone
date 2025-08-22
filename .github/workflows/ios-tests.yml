@@ -79,15 +79,33 @@ jobs:
           fi
         fi
         
-    - name: Clean build folder
+    - name: Verify simulator and build/test
       run: |
+        # Verify the simulator exists and is accessible
+        echo "Checking simulator status for: $SIMULATOR_UUID"
+        xcrun simctl list devices | grep "$SIMULATOR_UUID" || {
+          echo "Simulator not found, looking for any available booted simulator..."
+          AVAILABLE_SIM=$(xcrun simctl list devices | grep "(Booted)" | grep iPhone | head -1 | sed 's/.*(\([^)]*\)).*/\1/')
+          if [ ! -z "$AVAILABLE_SIM" ]; then
+            echo "Using available booted simulator: $AVAILABLE_SIM"
+            SIMULATOR_UUID="$AVAILABLE_SIM"
+          else
+            echo "No booted simulators found, exiting..."
+            exit 1
+          fi
+        }
+        
+        echo "Using simulator: $SIMULATOR_UUID"
+        
+        # Clean build folder
+        echo "Cleaning project..."
         xcodebuild clean \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
           -destination "platform=iOS Simulator,id=$SIMULATOR_UUID"
-    
-    - name: Build and test
-      run: |
+        
+        # Build and test
+        echo "Running tests..."
         xcodebuild test \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
