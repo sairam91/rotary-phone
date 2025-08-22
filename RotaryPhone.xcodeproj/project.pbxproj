@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		20DB0BEB2E558FAE00A82AF4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B1A2C542A1B3D5F00123456 /* Main.storyboard */; };
+		20DB0BEC2E558FAE00A82AF4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B1A2C592A1B3D6000123456 /* LaunchScreen.storyboard */; };
 		3B1A2C4E2A1B3D5F00123456 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1A2C4D2A1B3D5F00123456 /* AppDelegate.swift */; };
 		3B1A2C502A1B3D5F00123456 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1A2C4F2A1B3D5F00123456 /* SceneDelegate.swift */; };
 		3B1A2C522A1B3D5F00123456 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1A2C512A1B3D5F00123456 /* ViewController.swift */; };
-		3B1A2C552A1B3D5F00123456 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B1A2C532A1B3D5F00123456 /* Main.storyboard */; };
 		3B1A2C572A1B3D6000123456 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B1A2C562A1B3D6000123456 /* Assets.xcassets */; };
-		3B1A2C5A2A1B3D6000123456 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B1A2C582A1B3D6000123456 /* LaunchScreen.storyboard */; };
 		3B1A2C6C2A1B3D6000123456 /* RotaryDialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1A2C6B2A1B3D6000123456 /* RotaryDialView.swift */; };
 		3B1A2C6D2A1B3D6000123456 /* Firefly_audio_sound_of_a_rotary_dial_variation1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3B1A2C6E2A1B3D6000123456 /* Firefly_audio_sound_of_a_rotary_dial_variation1.wav */; };
 /* End PBXBuildFile section */
@@ -22,9 +22,9 @@
 		3B1A2C4D2A1B3D5F00123456 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3B1A2C4F2A1B3D5F00123456 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		3B1A2C512A1B3D5F00123456 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		3B1A2C542A1B3D5F00123456 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Main.storyboard; sourceTree = "<group>"; };
+		3B1A2C542A1B3D5F00123456 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		3B1A2C562A1B3D6000123456 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		3B1A2C592A1B3D6000123456 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		3B1A2C592A1B3D6000123456 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3B1A2C5B2A1B3D6000123456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3B1A2C6B2A1B3D6000123456 /* RotaryDialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotaryDialView.swift; sourceTree = "<group>"; };
 		3B1A2C6E2A1B3D6000123456 /* Firefly_audio_sound_of_a_rotary_dial_variation1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Firefly_audio_sound_of_a_rotary_dial_variation1.wav; sourceTree = "<group>"; };
@@ -64,9 +64,9 @@
 				3B1A2C4F2A1B3D5F00123456 /* SceneDelegate.swift */,
 				3B1A2C512A1B3D5F00123456 /* ViewController.swift */,
 				3B1A2C6B2A1B3D6000123456 /* RotaryDialView.swift */,
-				3B1A2C532A1B3D5F00123456 /* Main.storyboard */,
+				3B1A2C542A1B3D5F00123456 /* Main.storyboard */,
 				3B1A2C562A1B3D6000123456 /* Assets.xcassets */,
-				3B1A2C582A1B3D6000123456 /* LaunchScreen.storyboard */,
+				3B1A2C592A1B3D6000123456 /* LaunchScreen.storyboard */,
 				3B1A2C5B2A1B3D6000123456 /* Info.plist */,
 				3B1A2C6E2A1B3D6000123456 /* Firefly_audio_sound_of_a_rotary_dial_variation1.wav */,
 			);
@@ -131,9 +131,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3B1A2C5A2A1B3D6000123456 /* LaunchScreen.storyboard in Resources */,
+				20DB0BEC2E558FAE00A82AF4 /* LaunchScreen.storyboard in Resources */,
 				3B1A2C572A1B3D6000123456 /* Assets.xcassets in Resources */,
-				3B1A2C552A1B3D5F00123456 /* Main.storyboard in Resources */,
+				20DB0BEB2E558FAE00A82AF4 /* Main.storyboard in Resources */,
 				3B1A2C6D2A1B3D6000123456 /* Firefly_audio_sound_of_a_rotary_dial_variation1.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -153,25 +153,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		3B1A2C532A1B3D5F00123456 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3B1A2C542A1B3D5F00123456 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		3B1A2C582A1B3D6000123456 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3B1A2C592A1B3D6000123456 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		3B1A2C5C2A1B3D6000123456 /* Debug */ = {
@@ -300,6 +281,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9N26GQ3VG7;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RotaryPhone/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -327,6 +309,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9N26GQ3VG7;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RotaryPhone/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
