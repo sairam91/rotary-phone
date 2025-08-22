@@ -26,19 +26,54 @@ jobs:
     - name: List available schemes
       run: xcodebuild -list -project RotaryPhone.xcodeproj
       
-    - name: Create and boot simulator
+    - name: Find and use existing simulator
       run: |
-        # Create a new iPhone simulator with available iOS version
-        DEVICE_TYPE=$(xcrun simctl list devicetypes | grep iPhone | tail -1 | awk -F'[()]' '{print $(NF-1)}')
-        RUNTIME=$(xcrun simctl list runtimes | grep iOS | tail -1 | awk '{print $NF}')
-        echo "Creating simulator with device type: $DEVICE_TYPE and runtime: $RUNTIME"
+        # Look for existing booted simulators first
+        EXISTING_SIM=$(xcrun simctl list devices | grep "(Booted)" | grep iPhone | head -1 | sed 's/.*iPhone \([^(]*\) (\([^)]*\)).*/\2/')
         
-        SIMULATOR_UUID=$(xcrun simctl create "TestiPhone" "$DEVICE_TYPE" "$RUNTIME")
-        echo "Created simulator: $SIMULATOR_UUID"
-        
-        # Boot the simulator
-        xcrun simctl boot "$SIMULATOR_UUID"
-        echo "SIMULATOR_UUID=$SIMULATOR_UUID" >> $GITHUB_ENV
+        if [ ! -z "$EXISTING_SIM" ]; then
+          echo "Using existing booted simulator: $EXISTING_SIM"
+          echo "SIMULATOR_UUID=$EXISTING_SIM" >> $GITHUB_ENV
+        else
+          # Find a compatible device and runtime combination
+          echo "Available device types:"
+          xcrun simctl list devicetypes | grep iPhone
+          echo "Available runtimes:"
+          xcrun simctl list runtimes | grep iOS
+          
+          # Try iPhone 15 first, then fallback to others
+          DEVICE_TYPES=("com.apple.CoreSimulator.SimDeviceType.iPhone-15" "com.apple.CoreSimulator.SimDeviceType.iPhone-14" "com.apple.CoreSimulator.SimDeviceType.iPhone-13")
+          
+          for DEVICE_TYPE in "${DEVICE_TYPES[@]}"; do
+            echo "Trying device type: $DEVICE_TYPE"
+            # Find a stable iOS runtime (avoid beta versions)
+            RUNTIME=$(xcrun simctl list runtimes | grep iOS | grep -v beta | head -1 | awk '{print $NF}')
+            echo "Using runtime: $RUNTIME"
+            
+            SIMULATOR_UUID=$(xcrun simctl create "TestiPhone" "$DEVICE_TYPE" "$RUNTIME" 2>/dev/null || true)
+            
+            if [ ! -z "$SIMULATOR_UUID" ] && [ "$SIMULATOR_UUID" != "An error was encountered processing the command" ]; then
+              echo "Successfully created simulator: $SIMULATOR_UUID"
+              xcrun simctl boot "$SIMULATOR_UUID"
+              echo "SIMULATOR_UUID=$SIMULATOR_UUID" >> $GITHUB_ENV
+              break
+            else
+              echo "Failed to create simulator with $DEVICE_TYPE, trying next..."
+            fi
+          done
+          
+          if [ -z "$SIMULATOR_UUID" ]; then
+            echo "Failed to create any simulator, trying to use any available device"
+            # Use any available simulator as last resort
+            AVAILABLE_SIM=$(xcrun simctl list devices available | grep iPhone | head -1 | sed 's/.*(\([^)]*\)).*/\1/')
+            if [ ! -z "$AVAILABLE_SIM" ]; then
+              echo "SIMULATOR_UUID=$AVAILABLE_SIM" >> $GITHUB_ENV
+            else
+              echo "No available simulators found"
+              exit 1
+            fi
+          fi
+        fi
         
     - name: Clean build folder
       run: |
