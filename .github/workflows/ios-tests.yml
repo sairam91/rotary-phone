@@ -48,16 +48,31 @@ jobs:
           echo "iPhone 15 with iOS 18 already exists"
         else
           echo "Creating iPhone 15 simulator with iOS 18..."
-          DEVICE_TYPE="com.apple.CoreSimulator.SimDeviceType.iPhone-15"
-          RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-18-0"
           
-          # Create the simulator
-          SIMULATOR_UUID=$(xcrun simctl create "iPhone 15 Test" "$DEVICE_TYPE" "$RUNTIME")
-          echo "Created simulator: $SIMULATOR_UUID"
+          # Get the actual runtime identifier for iOS 18
+          RUNTIME=$(xcrun simctl list runtimes | grep "iOS 18" | head -1 | awk '{print $NF}')
+          echo "Found iOS 18 runtime: $RUNTIME"
           
-          # Boot the simulator
-          xcrun simctl boot "$SIMULATOR_UUID"
-          echo "Booted simulator: $SIMULATOR_UUID"
+          # Get device type for iPhone 15
+          DEVICE_TYPE=$(xcrun simctl list devicetypes | grep "iPhone 15" | head -1 | awk -F'[()]' '{print $(NF-1)}')
+          echo "Found iPhone 15 device type: $DEVICE_TYPE"
+          
+          if [ ! -z "$RUNTIME" ] && [ ! -z "$DEVICE_TYPE" ]; then
+            # Create the simulator
+            SIMULATOR_UUID=$(xcrun simctl create "iPhone 15 Test" "$DEVICE_TYPE" "$RUNTIME")
+            echo "Created simulator: $SIMULATOR_UUID"
+            
+            # Boot the simulator
+            xcrun simctl boot "$SIMULATOR_UUID"
+            echo "Booted simulator: $SIMULATOR_UUID"
+          else
+            echo "Could not find required runtime or device type"
+            echo "Available runtimes:"
+            xcrun simctl list runtimes | grep iOS
+            echo "Available device types:"
+            xcrun simctl list devicetypes | grep iPhone
+            exit 1
+          fi
         fi
         
     - name: Show available devices after creation
