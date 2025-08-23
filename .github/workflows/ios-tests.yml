@@ -17,6 +17,27 @@ jobs:
     - name: Show Xcode version
       run: xcodebuild -version
       
+    - name: Show available runtimes before installation
+      run: xcrun simctl list runtimes
+      
+    - name: Install iOS 18 Simulator
+      run: |
+        echo "Installing iOS 18 simulator runtime..."
+        # Check if iOS 18 is already available
+        if xcrun simctl list runtimes | grep -q "iOS 18"; then
+          echo "iOS 18 runtime already available"
+        else
+          echo "Installing iOS 18.0 simulator runtime..."
+          sudo xcrun simctl runtime add "iOS 18.0"
+          
+          # Wait for installation to complete
+          echo "Waiting for runtime installation to complete..."
+          sleep 30
+        fi
+        
+    - name: Show available runtimes after installation
+      run: xcrun simctl list runtimes
+      
     - name: Show available simulators
       run: xcrun simctl list devicetypes
       
@@ -25,14 +46,14 @@ jobs:
         xcodebuild clean \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2'
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=18.0'
     
     - name: Build and test
       run: |
         xcodebuild test \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=18.0' \
           -enableCodeCoverage YES \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
