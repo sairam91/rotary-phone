@@ -39,7 +39,29 @@ jobs:
       run: xcrun simctl list runtimes
       
     - name: Show available simulators
-      run: xcrun simctl list devicetypes
+      run: xcrun simctl list devices
+      
+    - name: Create iPhone 15 with iOS 18 if needed
+      run: |
+        # Check if iPhone 15 with iOS 18 exists
+        if xcrun simctl list devices | grep -q "iPhone 15.*18\."; then
+          echo "iPhone 15 with iOS 18 already exists"
+        else
+          echo "Creating iPhone 15 simulator with iOS 18..."
+          DEVICE_TYPE="com.apple.CoreSimulator.SimDeviceType.iPhone-15"
+          RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-18-0"
+          
+          # Create the simulator
+          SIMULATOR_UUID=$(xcrun simctl create "iPhone 15 Test" "$DEVICE_TYPE" "$RUNTIME")
+          echo "Created simulator: $SIMULATOR_UUID"
+          
+          # Boot the simulator
+          xcrun simctl boot "$SIMULATOR_UUID"
+          echo "Booted simulator: $SIMULATOR_UUID"
+        fi
+        
+    - name: Show available devices after creation
+      run: xcrun simctl list devices | head -20
       
     - name: Clean build folder
       run: |
