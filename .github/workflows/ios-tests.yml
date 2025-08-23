@@ -17,80 +17,26 @@ jobs:
     - name: Show Xcode version
       run: xcodebuild -version
       
-    - name: Show available runtimes before installation
-      run: xcrun simctl list runtimes
-      
-    - name: Install iOS 18 Simulator
+    - name: Show available simulators and runtimes
       run: |
-        echo "Installing iOS 18 simulator runtime..."
-        # Check if iOS 18 is already available
-        if xcrun simctl list runtimes | grep -q "iOS 18"; then
-          echo "iOS 18 runtime already available"
-        else
-          echo "Installing iOS 18.0 simulator runtime..."
-          sudo xcrun simctl runtime add "iOS 18.0"
-          
-          # Wait for installation to complete
-          echo "Waiting for runtime installation to complete..."
-          sleep 30
-        fi
-        
-    - name: Show available runtimes after installation
-      run: xcrun simctl list runtimes
-      
-    - name: Show available simulators
-      run: xcrun simctl list devices
-      
-    - name: Create iPhone 15 with iOS 18 if needed
-      run: |
-        # Check if iPhone 15 with iOS 18 exists
-        if xcrun simctl list devices | grep -q "iPhone 15.*18\."; then
-          echo "iPhone 15 with iOS 18 already exists"
-        else
-          echo "Creating iPhone 15 simulator with iOS 18..."
-          
-          # Get the actual runtime identifier for iOS 18
-          RUNTIME=$(xcrun simctl list runtimes | grep "iOS 18" | head -1 | awk '{print $NF}')
-          echo "Found iOS 18 runtime: $RUNTIME"
-          
-          # Get device type for iPhone 15
-          DEVICE_TYPE=$(xcrun simctl list devicetypes | grep "iPhone 15" | head -1 | awk -F'[()]' '{print $(NF-1)}')
-          echo "Found iPhone 15 device type: $DEVICE_TYPE"
-          
-          if [ ! -z "$RUNTIME" ] && [ ! -z "$DEVICE_TYPE" ]; then
-            # Create the simulator
-            SIMULATOR_UUID=$(xcrun simctl create "iPhone 15 Test" "$DEVICE_TYPE" "$RUNTIME")
-            echo "Created simulator: $SIMULATOR_UUID"
-            
-            # Boot the simulator
-            xcrun simctl boot "$SIMULATOR_UUID"
-            echo "Booted simulator: $SIMULATOR_UUID"
-          else
-            echo "Could not find required runtime or device type"
-            echo "Available runtimes:"
-            xcrun simctl list runtimes | grep iOS
-            echo "Available device types:"
-            xcrun simctl list devicetypes | grep iPhone
-            exit 1
-          fi
-        fi
-        
-    - name: Show available devices after creation
-      run: xcrun simctl list devices | head -20
+        echo "Available iOS runtimes:"
+        xcrun simctl list runtimes | grep iOS
+        echo "Available devices:"
+        xcrun simctl list devices available | grep iPhone
       
     - name: Clean build folder
       run: |
         xcodebuild clean \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 15 Test,OS=18.4'
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
     
     - name: Build and test
       run: |
         xcodebuild test \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 15 Test,OS=18.4' \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
           -enableCodeCoverage YES \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
