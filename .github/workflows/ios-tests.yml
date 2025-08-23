@@ -14,113 +14,30 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Show available Xcode versions
-      run: ls /Applications/ | grep Xcode
+    - name: Select Xcode version
+      run: sudo xcode-select -switch /Applications/Xcode_15.4.app/Contents/Developer
       
-    - name: Show current Xcode version
+    - name: Show Xcode version
       run: xcodebuild -version
       
     - name: Show available simulators
-      run: xcrun simctl list devices available | head -20
+      run: xcrun simctl list devicetypes
       
-    - name: List available schemes
-      run: xcodebuild -list -project RotaryPhone.xcodeproj
-      
-    - name: Find and use existing simulator
+    - name: Clean build folder
       run: |
-        # Look for existing booted simulators first
-        EXISTING_SIM=$(xcrun simctl list devices | grep "(Booted)" | grep iPhone | head -1 | sed 's/.*iPhone \([^(]*\) (\([^)]*\)).*/\2/')
-        
-        if [ ! -z "$EXISTING_SIM" ]; then
-          echo "Using existing booted simulator: $EXISTING_SIM"
-          echo "SIMULATOR_UUID=$EXISTING_SIM" >> $GITHUB_ENV
-        else
-          # Find a compatible device and runtime combination
-          echo "Available device types:"
-          xcrun simctl list devicetypes | grep iPhone
-          echo "Available runtimes:"
-          xcrun simctl list runtimes | grep iOS
-          
-          # Try iPhone 15 first, then fallback to others
-          DEVICE_TYPES=("com.apple.CoreSimulator.SimDeviceType.iPhone-15" "com.apple.CoreSimulator.SimDeviceType.iPhone-14" "com.apple.CoreSimulator.SimDeviceType.iPhone-13")
-          
-          for DEVICE_TYPE in "${DEVICE_TYPES[@]}"; do
-            echo "Trying device type: $DEVICE_TYPE"
-            # Find a stable iOS runtime (avoid beta versions and prefer 18.5+)
-            RUNTIME=$(xcrun simctl list runtimes | grep iOS | grep -v beta | grep -E "(18\.[5-9]|19\.)" | head -1 | awk '{print $NF}')
-            if [ -z "$RUNTIME" ]; then
-              # Fallback to any stable iOS runtime
-              RUNTIME=$(xcrun simctl list runtimes | grep iOS | grep -v beta | head -1 | awk '{print $NF}')
-            fi
-            echo "Using runtime: $RUNTIME"
-            
-            SIMULATOR_UUID=$(xcrun simctl create "TestiPhone" "$DEVICE_TYPE" "$RUNTIME" 2>/dev/null || true)
-            
-            if [ ! -z "$SIMULATOR_UUID" ] && [ "$SIMULATOR_UUID" != "An error was encountered processing the command" ]; then
-              echo "Successfully created simulator: $SIMULATOR_UUID"
-              xcrun simctl boot "$SIMULATOR_UUID"
-              echo "SIMULATOR_UUID=$SIMULATOR_UUID" >> $GITHUB_ENV
-              break
-            else
-              echo "Failed to create simulator with $DEVICE_TYPE, trying next..."
-            fi
-          done
-          
-          if [ -z "$SIMULATOR_UUID" ]; then
-            echo "Failed to create any simulator, trying to use any available device"
-            # Use any available simulator as last resort
-            AVAILABLE_SIM=$(xcrun simctl list devices available | grep iPhone | head -1 | sed 's/.*(\([^)]*\)).*/\1/')
-            if [ ! -z "$AVAILABLE_SIM" ]; then
-              echo "SIMULATOR_UUID=$AVAILABLE_SIM" >> $GITHUB_ENV
-            else
-              echo "No available simulators found"
-              exit 1
-            fi
-          fi
-        fi
-        
-    - name: Verify simulator and build/test
-      run: |
-        # Verify the simulator exists and is accessible
-        echo "Checking simulator status for: $SIMULATOR_UUID"
-        xcrun simctl list devices | grep "$SIMULATOR_UUID" || {
-          echo "Simulator not found, looking for any available booted simulator..."
-          AVAILABLE_SIM=$(xcrun simctl list devices | grep "(Booted)" | grep iPhone | head -1 | sed 's/.*(\([^)]*\)).*/\1/')
-          if [ ! -z "$AVAILABLE_SIM" ]; then
-            echo "Using available booted simulator: $AVAILABLE_SIM"
-            SIMULATOR_UUID="$AVAILABLE_SIM"
-          else
-            echo "No booted simulators found, exiting..."
-            exit 1
-          fi
-        }
-        
-        echo "Using simulator: $SIMULATOR_UUID"
-        
-        # Clean build folder
-        echo "Cleaning project..."
         xcodebuild clean \
           -project RotaryPhone.xcodeproj \
-          -scheme RotaryPhone \
-          -destination "platform=iOS Simulator,id=$SIMULATOR_UUID"
-        
-        # Build and test
-        echo "Running tests..."
+          -scheme RotaryPhone
+    
+    - name: Build and test
+      run: |
         xcodebuild test \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
           -enableCodeCoverage YES \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
-          
-    - name: Cleanup simulator
-      if: always()
-      run: |
-        if [ ! -z "$SIMULATOR_UUID" ]; then
-          xcrun simctl shutdown "$SIMULATOR_UUID" || true
-          xcrun simctl delete "$SIMULATOR_UUID" || true
-        fi
           
     - name: Generate test report
       if: always()
