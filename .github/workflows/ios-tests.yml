@@ -83,14 +83,14 @@ jobs:
         xcodebuild clean \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=18.0'
+          -destination 'platform=iOS Simulator,name=iPhone 15 Test,OS=18.4'
     
     - name: Build and test
       run: |
         xcodebuild test \
           -project RotaryPhone.xcodeproj \
           -scheme RotaryPhone \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=18.0' \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Test,OS=18.4' \
           -enableCodeCoverage YES \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
